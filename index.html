@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Poll Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .poll-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Authentication Section -->
+        <div id="auth-section" class="poll-container">
+            <h2 class="text-center">Login / Signup</h2>
+            <form id="auth-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+
+        <!-- Poll Creation Section -->
+        <div id="poll-create-section" class="poll-container" style="display: none;">
+            <h2 class="text-center">Create a Poll</h2>
+            <form id="poll-create-form">
+                <div class="mb-3">
+                    <label for="poll-question" class="form-label">Poll Question</label>
+                    <input type="text" id="poll-question" class="form-control" required>
+                </div>
+                <div id="options-container">
+                    <div class="mb-3">
+                        <label for="option-1" class="form-label">Option 1</label>
+                        <input type="text" id="option-1" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="option-2" class="form-label">Option 2</label>
+                        <input type="text" id="option-2" class="form-control" required>
+                    </div>
+                </div>
+                <button type="button" id="add-option" class="btn btn-secondary">Add Option</button>
+                <button type="submit" class="btn btn-success w-100 mt-3">Create Poll</button>
+            </form>
+        </div>
+
+        <!-- Polls Section -->
+        <div id="polls-section" class="poll-container" style="display: none;">
+            <h2 class="text-center">Active Polls</h2>
+            <div id="polls-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between sections
+        const authSection = document.getElementById('auth-section');
+        const pollCreateSection = document.getElementById('poll-create-section');
+        const pollsSection = document.getElementById('polls-section');
+
+        const authForm = document.getElementById('auth-form');
+        const pollCreateForm = document.getElementById('poll-create-form');
+        const addOptionButton = document.getElementById('add-option');
+        const optionsContainer = document.getElementById('options-container');
+        const pollsList = document.getElementById('polls-list');
+
+        let optionCount = 2;
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate successful login
+            authSection.style.display = 'none';
+            pollCreateSection.style.display = 'block';
+            pollsSection.style.display = 'block';
+        });
+
+        addOptionButton.addEventListener('click', () => {
+            optionCount++;
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'mb-3';
+            optionDiv.innerHTML = `
+                <label for="option-${optionCount}" class="form-label">Option ${optionCount}</label>
+                <input type="text" id="option-${optionCount}" class="form-control" required>
+            `;
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        pollCreateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const question = document.getElementById('poll-question').value;
+            const options = [];
+            for (let i = 1; i <= optionCount; i++) {
+                const option = document.getElementById(`option-${i}`).value;
+                options.push(option);
+            }
+
+            const poll = { question, options, votes: Array(options.length).fill(0) };
+            displayPoll(poll);
+
+            pollCreateForm.reset();
+            optionsContainer.innerHTML = '';
+            optionCount = 2;
+            addOptionButton.click();
+            addOptionButton.click();
+        });
+
+        function displayPoll(poll) {
+            const pollDiv = document.createElement('div');
+            pollDiv.className = 'mb-4';
+            pollDiv.innerHTML = `
+                <h5>${poll.question}</h5>
+                <div>
+                    ${poll.options.map((option, index) => `
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="poll-${poll.question}" id="poll-${poll.question}-option-${index}">
+                            <label class="form-check-label" for="poll-${poll.question}-option-${index}">
+                                ${option}
+                            </label>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-primary mt-2">Vote</button>
+            `;
+            pollsList.appendChild(pollDiv);
+        }
+    </script>
+</body>
+</html>
